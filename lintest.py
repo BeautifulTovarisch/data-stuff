@@ -66,7 +66,9 @@ def readPoints(filename, header=False):
     TODO: More validation?
   """
   def parseLine(line):
-    return line.split()[:2]
+    d = line.split()
+
+    return (float(d[0]), float(d[1]))
 
   if not os.path.exists(filename):
     raise FileNotFoundError(filename)
@@ -74,7 +76,7 @@ def readPoints(filename, header=False):
   with open(filename, 'r') as data:
     lines = list(data)[1:] if header else list(data)
 
-    return [tuple(parseLine(line)) for line in lines]
+    return [parseLine(line) for line in lines]
 
 def slopes(points):
   """
