@@ -1,13 +1,13 @@
 """lintest
 
-   A simple program that accepts a list of data points and computes the slope
-   between successive pairs of points.
+  Functions which provide helpful computations when determining whether a data
+  set might be approxiately modeled as a linear function.
 """
 
 import os.path
 
-def computeSlope(a, b):
-  """computeSlope is the slope of the line passing through points a and b.
+def slope(a, b):
+  """slope is the slope of the line passing through points a and b.
 
     Parameters:
       a, b (float, float): Tuples whose elements correspond to the x and y
@@ -20,7 +20,7 @@ def computeSlope(a, b):
       ZeroDivisionError: if a[0] = b[0]
 
     Example:
-      >>> computeSlope((11, 68), (11.25, 85))
+      >>> slope((11, 68), (11.25, 85))
       68.0
   """
 
@@ -104,4 +104,83 @@ def slopes(points):
 
   n = len(points)
 
-  return [computeSlope(points[i], points[i+1]) for i in range(n-1)]
+  return [slope(points[i], points[i+1]) for i in range(n-1)]
+
+def yIntercept(point, m):
+  """yIntercept computes the vertical intercept b in the eqn
+     y = mx + b given a [point] and slope [m].
+
+    Parameters:
+      point (float, float): A tuple representing a point in the plane.
+      m (float): The slope of line
+
+    Output:
+      The point (0, b) that intercepts the y-axis.
+
+    Example:
+      Suppose we are given points (1, 2) and (6, 3). Then,
+
+      >>> m = slope((1, 2), (6, 3))
+      >>> yIntercept((1, 2), m)
+      1.8
+  """
+  x, y = point
+
+  return y - m * x
+
+def conjectureSlope(slopes):
+  """conjectureSlope is the average of a list of slopes through successive points.
+
+    Parameters:
+      slopes ([]float): A list of slopes between successive points p_i, p_i+1
+
+    Output:
+      The arithmetic mean of the slopes. If slopes is empty, then 0 is returned
+
+    Example:
+      >>> conjectureSlope([
+      ... 68.0,
+      ... 64.0,
+      ... 64.0,
+      ... 68.0
+      ... ])
+      66.0
+
+      >>> conjectureSlope([])
+      0
+  """
+  if not slopes:
+    return 0
+
+  return sum(slopes) / len(slopes)
+
+def conjectureIntercept(points, conjecturedSlope):
+    """conjectureIntercept computes the y-intercept for each point p in [points]
+       and returns the arithmetic mean
+
+      Parameters:
+        points ([](float, float)): A list of points in the plane
+        conjecturedSlope (float): The average of pairwise slopes computed from
+        a sequence of successive points.
+
+      Output:
+        The arithmetic mean of the y-intercepts of each point in [points].
+
+      Example:
+        >>> m = conjectureSlope([
+        ... 68.0,
+        ... 64.0,
+        ... 64.0,
+        ... 68.0
+        ... ])
+        >>> conjectureIntercept([
+        ...  (11, 68),
+        ...  (11.25, 85),
+        ...  (11.5, 101),
+        ...  (11.75, 117),
+        ...  (12.75, 185)
+        ... ], m)
+        -657.7
+    """
+
+    return sum([yIntercept(p, conjecturedSlope) for p in points]) / len(points)
