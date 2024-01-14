@@ -128,31 +128,35 @@ def yIntercept(point, m):
 
   return y - m * x
 
-def conjectureSlope(slopes):
-  """conjectureSlope is the average of a list of slopes through successive points.
+def conjectureSlope(points):
+  """conjectureSlope is the average of a list of slopes through successive
+     [points].
 
     Parameters:
-      slopes ([]float): A list of slopes between successive points p_i, p_i+1
+      slopes ([]float): A list of points in the plane.
 
     Output:
-      The arithmetic mean of the slopes. If slopes is empty, then 0 is returned
+      The arithmetic mean of the slopes. If [points] is empty, then 0 is returned
 
     Example:
       >>> conjectureSlope([
-      ... 68.0,
-      ... 64.0,
-      ... 64.0,
-      ... 68.0
+      ...  (11, 68),
+      ...  (11.25, 85),
+      ...  (11.5, 101),
+      ...  (11.75, 117),
+      ...  (12.75, 185)
       ... ])
       66.0
 
       >>> conjectureSlope([])
       0
   """
-  if not slopes:
+  if not points:
     return 0
 
-  return sum(slopes) / len(slopes)
+  sumSlopes = slopes(points)
+
+  return sum(sumSlopes) / len(sumSlopes)
 
 def conjectureIntercept(points, conjecturedSlope):
     """conjectureIntercept computes the y-intercept for each point p in [points]
@@ -168,11 +172,13 @@ def conjectureIntercept(points, conjecturedSlope):
 
       Example:
         >>> m = conjectureSlope([
-        ... 68.0,
-        ... 64.0,
-        ... 64.0,
-        ... 68.0
+        ...  (11, 68),
+        ...  (11.25, 85),
+        ...  (11.5, 101),
+        ...  (11.75, 117),
+        ...  (12.75, 185)
         ... ])
+
         >>> conjectureIntercept([
         ...  (11, 68),
         ...  (11.25, 85),
@@ -184,3 +190,31 @@ def conjectureIntercept(points, conjecturedSlope):
     """
 
     return sum([yIntercept(p, conjecturedSlope) for p in points]) / len(points)
+
+def conjectureEquation(points):
+    """
+    conjectureEquations computes a candidate for a linear equation model given
+    a set of [points]. This functional is largely decorative and no attempt at
+    simplification or symbolic representation (i.e m = (1/2) is attempted.
+
+    Parameters:
+      points ([]float): A list of points in the plane.
+
+    Output:
+      A string of the form y = mx + b where m and b are conjectured.
+
+    Example:
+    >>> conjectureEquation([
+    ...  (11, 68),
+    ...  (11.25, 85),
+    ...  (11.5, 101),
+    ...  (11.75, 117),
+    ...  (12.75, 185)
+    ... ])
+    'y = 66.0 * x + -657.7'
+    """
+
+    m = conjectureSlope(points)
+    b = conjectureIntercept(points, m)
+
+    return f'y = {m} * x + {b}'
