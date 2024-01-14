@@ -19,3 +19,15 @@ Calculus.
 |--------|-------|
 |Python  |3.8.10 |
 |Gnuplot |5.2.8  |
+
+## Testing
+
+I plan to include [doctests](https://docs.python.org/3/library/doctest.html) as
+often as is reasonable. These can be run with:
+
+```bash
+python -m doctest <path/to/file>
+```
+
+I personally find these tremendously helpful for the computational nature of
+working with datasets.
