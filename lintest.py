@@ -4,7 +4,6 @@
    between successive pairs of points.
 
    TODO: Have this read in files in the 'gnuplot' (tsv) format
-   TODO: Good candidate for doc tests
 """
 
 def computeSlope(a, b):
