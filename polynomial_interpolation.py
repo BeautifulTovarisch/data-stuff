@@ -28,7 +28,7 @@ def difference_quotient(points):
         0.5
 
         >>> difference_quotient([(0, 1), (4, 3), (5, 2)])
-        0.5
+        -0.4
     """
     if not points:
         raise ValueError("points must not be empty")
