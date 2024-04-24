@@ -40,8 +40,8 @@ def difference_quotient(points):
 
     mid = n//2
 
-    left = points[:mid]
-    right = points[mid:]
+    left = points[:n-1]
+    right = points[1:n]
 
     # We only care about the value of f(x) here
     lquot = difference_quotient(left)
@@ -51,20 +51,20 @@ def difference_quotient(points):
     b, _ = points[n-1]
 
     # The denominator is always the endpoints of the current interval.
-    return (rquot - lquot) / (b - a)
+    dquot = (rquot - lquot) / (b - a)
 
-def _multiply_all(terms):
-    product = 1
-
-    for term in terms:
-        product *= term
-
-    return product
+    return dquot
 
 # Output an array A, such that A[i] = the product of (z-x_0)(z-x_1)...(z-x_i)
 # These form the terms of the linear combination used in the interpolate proc.
 def _compute_terms(xs, z):
-    return [_multiply_all([z - x for x in xs[:i]]) for i in range(len(xs))]
+    n = len(xs)
+
+    A = [1 for _ in range(n+1)]
+    for i in range(1, n+1):
+        A[i] = A[i-1]*(z - xs[i-1])
+
+    return A
 
 # Perform the interpolation algorithm on a single point.
 def _single_point(coefficients, terms):
@@ -96,8 +96,9 @@ def interpolate(known_pts, unknown_pts):
     n = len(known_pts)
 
     coefs = [difference_quotient(known_pts[:i+1]) for i in range(n)]
-    terms = _compute_terms([x for x, _ in known_pts], unknown_pts[0])
 
-    print(_single_point(coefs, terms))
+    for z in unknown_pts:
+        terms = _compute_terms([x for x, _ in known_pts], z)
+        print(_single_point(coefs, terms))
 
     return []
