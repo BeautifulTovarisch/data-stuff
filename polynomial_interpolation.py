@@ -60,15 +60,15 @@ def difference_quotient(points):
 def _compute_terms(xs, z):
     n = len(xs)
 
-    A = [1 for _ in range(n+1)]
-    for i in range(1, n+1):
+    A = [1 for _ in range(n)]
+    for i in range(1, n):
         A[i] = A[i-1]*(z - xs[i-1])
 
     return A
 
 # Perform the interpolation algorithm on a single point.
 def _single_point(coefficients, terms):
-    return sum([c*t for c in coefficients for t in terms])
+    return sum([coefficients[i]*terms[i] for i in range(len(terms))])
 
 def interpolate(known_pts, unknown_pts):
     """
@@ -83,22 +83,20 @@ def interpolate(known_pts, unknown_pts):
         approximated
 
     Output:
-        A list of real numbers corresponding to the points given in [zs].
+        A list of approximations corresponding to the points in [unknown_pts].
 
     Examples:
-        # >>> xs = [-3.0, -2.0, 2.0, 2.0]
-        # >>> ys = [-5.0, -1.1, 1.9, 4.8]
-        # >>> zs = [-2.5, 0, 2.5]
-        # >>> interp_recur(list(zip(xs, ys)), zs)
-        # [-2.694, 0.8000, 3.044]
     """
-
     n = len(known_pts)
+    m = len(unknown_pts)
 
+    soln = [0 for _ in range(m)]
+
+    # Coefficients can be computed once and reused for subsequent approximations
     coefs = [difference_quotient(known_pts[:i+1]) for i in range(n)]
 
-    for z in unknown_pts:
-        terms = _compute_terms([x for x, _ in known_pts], z)
-        print(_single_point(coefs, terms))
+    for i in range(m):
+        terms = _compute_terms([x for x, _ in known_pts], unknown_pts[i])
+        soln[i] = _single_point(coefs, terms)
 
-    return []
+    return soln

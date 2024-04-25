@@ -25,4 +25,7 @@ class TestInterpolate(unittest.TestCase):
 
         zs = [-2.5, 0.0, 2.5]
 
-        interpolate(points, zs)
+        expected = [-2.694, 0.8000, 3.044]
+
+        for i, pt in enumerate(interpolate(points, zs)):
+            self.assertAlmostEqual(pt, expected[i], places=3)
