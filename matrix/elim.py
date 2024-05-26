@@ -29,6 +29,14 @@ def check_row(i, maxRow):
         msg = f'invalid row: {i}. rows must be between 1 and {maxRow}'
         raise IndexError(msg)
 
+# Print the rows of A
+def printm(A):
+    for row in A:
+        for entry in row:
+            print(entry, end='\t')
+
+        print()
+
 def scale(A, i, c):
     """
     scale performs scalar multiplication on row [i] in [A].
@@ -188,9 +196,9 @@ def swap(A, i, j):
     A[i], A[j] = A[j], A[i]
 
 if __name__ == "__main__":
+    print()
     # TODO:
     #   Parse input matrix
     #   Design commands
     #   Parse commands and evaluate (simple "repl")
     #   Handle CTRL+C (optional)
-    print('hello')
