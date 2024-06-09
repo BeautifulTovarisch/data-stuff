@@ -154,9 +154,9 @@ def mat_sub(A, B):
 
     return [[A[i][j] - B[i][j] for j in range(len(A[0]))] for i in range(len(A))]
 
-def tr(A):
+def trans(A):
     """
-    tr computes the transpose of [A].
+    trans computes the transpose of [A].
 
     Input:
         A (Matrix): A matrix with integer entries
@@ -170,7 +170,7 @@ def tr(A):
         ... [-1, 2],
         ... [1, 1]
         ... ]
-        >>> tr(A)
+        >>> trans(A)
         [[3, -1, 1], [0, 2, 1]]
     """
     if not A:
@@ -213,7 +213,7 @@ def vecmat(v, A):
     check_dim([v], A, lambda _, b, c, _2: b == c)
 
     # TODO: Awful. Refactor later to avoid this step.
-    T = tr(A)
+    T = trans(A)
 
     return [_dot(v, row) for row in T]
 
@@ -249,6 +249,15 @@ def matvec(A, v):
         >>> v = [3, 6, 0]
         >>> matvec(A, v)
         [6, 6, 63]
+
+        >>> A = [
+        ... [6, -2, 4],
+        ... [0, 1, 3],
+        ... [7, 7, 5]
+        ... ]
+        >>> v = [4, 3, 5]
+        >>> matvec(A, v)
+        [38, 18, 74]
     """
 
     # Since row and column vectors are represented the same way, we compare
@@ -256,3 +265,110 @@ def matvec(A, v):
     check_dim(A, [v], lambda _, b, _2, d: b == d)
 
     return [_dot(row, v) for row in A]
+
+def classic_multiply(A, B):
+    """
+    classic_mulitply performs a cache-unfriendly, O(n^3) matrix multiplication
+    using the standard triple-loop with no intelligent tricks.
+
+    Input:
+        A (Matrix): An mxn matrix
+        B (Matrix): An nxl matrix
+
+    Output:
+        The mxl matrix obtained via matrix multiplication of [A] and [B].
+
+    Examples:
+        >>> A = [
+        ... [1, 2],
+        ... [2, 1],
+        ... ]
+        >>> B = [
+        ... [1, 0],
+        ... [0, 1],
+        ... ]
+        >>> classic_multiply(A, B)
+        [[1, 2], [2, 1]]
+
+        >>> A = [
+        ... [3, 1],
+        ... [2, 1]
+        ... ]
+        >>> classic_multiply(classic_multiply(A, A), A)
+        [[41, 15], [30, 11]]
+    """
+
+    check_dim(A, B, lambda _, b, c, _2: b == c)
+
+    m = len(A)
+    n = len(A[0])
+    l = len(B[0])
+
+    # Output matrix is mxl
+    C = [[0 for _ in range(l)] for _ in range(m)]
+
+    for i in range(m):
+        entry = 0
+        for k in range(l):
+            for j in range(n):
+                C[i][k] += A[i][j] * B[j][k]
+
+    return C
+
+def rc_multiply(A, B):
+    """
+    rc_multiply performs the matrix multiplication AB by row-column partitions:
+
+        A = [c1 c2 c3 ... cn]
+        B = [r1 r2 r3 ... rn]
+
+    and computing the matrix summation:
+
+        c1r1 + c2r2 + ... cnrn
+
+    Input:
+        A (Matrix): An mxn matrix
+        B (Matrix): An nxl matrix
+
+    Output:
+        The mxl matrix obtained via matrix multiplication of [A] and [B].
+
+    Examples:
+        >>> A = [
+        ... [1, 2],
+        ... [2, 1],
+        ... ]
+        >>> B = [
+        ... [1, 0],
+        ... [0, 1],
+        ... ]
+        >>> rc_multiply(A, B)
+        [[1, 2], [2, 1]]
+
+        >>> A = [
+        ... [3, 1],
+        ... [2, 1]
+        ... ]
+        >>> rc_multiply(rc_multiply(A, A), A)
+        [[41, 15], [30, 11]]
+    """
+
+    check_dim(A, B, lambda _, b, c, _2: b == c)
+
+    # Easier to iterate over columns of [A].
+    aT = trans(A)
+
+    r = len(A)
+    c = len(B[0])
+
+    C = [[0 for _ in range(c)] for _ in range(r)]
+
+    # This approach screams parallelizable.
+    for i in range(r):
+        # Form a linear combination of the rows of B with coefficients given by
+        # the columns of A.
+        partial = [[a * b for b in B[i]] for a in aT[i]]
+
+        C = mat_add(C, partial)
+
+    return C
