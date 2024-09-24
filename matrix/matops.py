@@ -8,7 +8,7 @@ This module performs basic matrix arithmetic operations. Each operation checks
 the input matrices for validity, throwing an exception if the operation cannot
 be performed.
 
-TODO: Develop another 'language' that makes these operations even easier.
+TODO: Develop a 'language' that makes these operations even easier.
 """
 
 def check_dim(A, B, fn):

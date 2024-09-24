@@ -195,6 +195,83 @@ def swap(A, i, j):
 
     A[i], A[j] = A[j], A[i]
 
+def reduce(A):
+    """
+    reduce performs elementary row operations on [A] until it is in row-echelon
+    form.
+
+    TODO: This is a fairly confusing function with seemingly endless edge cases.
+    I should review a proper implementation and compare my approach.
+
+    Input:
+        A (Matrix): An mxn matrix
+
+    Output:
+        A reduced to row-echelon form
+
+    Examples:
+        >>> reduce([[0, 0], [0, 0]])
+        [[0, 0], [0, 0]]
+
+        >>> reduce([[1, 0], [0, 1]])
+        [[1.0, 0.0], [0.0, 1.0]]
+
+        >>> reduce([[1, 0, 0], [0, 0, 0], [0, 0, 1]])
+        [[1.0, 0.0, 0.0], [0.0, 0.0, 1.0], [0, 0, 0]]
+
+        >>> reduce([[4, -4], [-2, 2]])
+        [[1.0, -1.0], [0.0, 0.0]]
+
+        >>> reduce([[4, 0, 1], [-2, 1, 0], [-2, 0, 1]])
+        [[1.0, 0.0, 0.25], [0.0, 1.0, 0.5], [0.0, 0.0, 1.0]]
+    """
+    def place_pivot(A, i, rows):
+        # Find the index of the next pivot, if any
+        for j in range(i, rows):
+            if A[j][i]:
+                A[i],A[j] = A[j],A[j]
+                break
+
+        return A[i][i]
+
+    # Place 0 rows beneath any pivot rows
+    def order_pivots(A):
+        for i in range(len(A)-1, 0, -1):
+            if not B[i-1][i-1]:
+                B[i],B[i-1] = B[i-1],B[i]
+
+    # Algorithm:
+    #   Locate pivot if A[i][i] is 0, moving such occurrences to the bottom
+    #       If there is no such row, skip
+    #   Eliminate rows using combine()
+    #   Repeat until all pivots are located or remaining rows are all zero.
+    B = [[col for col in row] for row in A]
+
+    rows = len(A)
+    cols = len(A[0])
+
+    # We can only ever produce at most [rank] pivot rows
+    maxrank = min(rows, cols)
+
+    for i in range(maxrank):
+        pivot = place_pivot(B, i, rows)
+        if not pivot:
+            continue
+
+        B[i] = [1/pivot*b for b in B[i]]
+
+        for j in range(i+1, rows):
+            if not B[j][i]:
+                continue
+
+            p = B[j][i]
+
+            B[j] = [-p*B[i][k] + B[j][k] for k in range(i, cols)]
+
+    order_pivots(B)
+
+    return B
+
 if __name__ == "__main__":
     print()
     # TODO:
