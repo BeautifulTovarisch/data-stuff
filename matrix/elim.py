@@ -214,37 +214,35 @@ def reduce(A):
         [[0, 0], [0, 0]]
 
         >>> reduce([[1, 0], [0, 1]])
-        [[1.0, 0.0], [0.0, 1.0]]
+        [[1, 0], [0, 1]]
 
         >>> reduce([[1, 0, 0], [0, 0, 0], [0, 0, 1]])
-        [[1.0, 0.0, 0.0], [0.0, 0.0, 1.0], [0, 0, 0]]
+        [[1, 0, 0], [0, 0, 1], [0, 0, 0]]
 
         >>> reduce([[4, -4], [-2, 2]])
-        [[1.0, -1.0], [0.0, 0.0]]
+        [[1, -1], [0, 0]]
 
         >>> reduce([[4, 0, 1], [-2, 1, 0], [-2, 0, 1]])
-        [[1.0, 0.0, 0.25], [0.0, 1.0, 0.5], [0.0, 0.0, 1.0]]
+        [[1, 0, 0.25], [0, 1, 0.5], [0, 0, 1]]
+
+        >>> reduce([[1, 0], [0, 0], [0, -1], [2, 0]])
+        [[1, 0], [0, 1], [0, 0], [0, 0]]
+
+        >>> reduce([[0, 0, 0, 1], [1, 0, 1, 0]])
+        [[1, 0, 1, 0], [0, 0, 0, 1]]
+
+        >>> reduce([[1, -3, 3], [3, -5, 3], [6, -6, 4]])
+        [[1, -3, 3], [0, 1, -1.5], [0, 0, 1]]
     """
-    def place_pivot(A, i, rows):
+    def place_pivot(A, pidx, i):
         # Find the index of the next pivot, if any
-        for j in range(i, rows):
+        for j in range(i, len(A)):
             if A[j][i]:
-                A[i],A[j] = A[j],A[j]
+                A[pidx],A[j] = A[j],A[pidx]
                 break
 
-        return A[i][i]
+        return A[pidx][i]
 
-    # Place 0 rows beneath any pivot rows
-    def order_pivots(A):
-        for i in range(len(A)-1, 0, -1):
-            if not B[i-1][i-1]:
-                B[i],B[i-1] = B[i-1],B[i]
-
-    # Algorithm:
-    #   Locate pivot if A[i][i] is 0, moving such occurrences to the bottom
-    #       If there is no such row, skip
-    #   Eliminate rows using combine()
-    #   Repeat until all pivots are located or remaining rows are all zero.
     B = [[col for col in row] for row in A]
 
     rows = len(A)
@@ -253,22 +251,30 @@ def reduce(A):
     # We can only ever produce at most [rank] pivot rows
     maxrank = min(rows, cols)
 
+    # Algorithm:
+    #   Locate pivot if A[i][i] is 0, moving such occurrences to the bottom
+    #       If there is no such row, skip
+    #   Eliminate rows using combine()
+    #   Repeat until all pivots are located or remaining rows are all zero.
+    pidx = 0
     for i in range(maxrank):
-        pivot = place_pivot(B, i, rows)
+        pivot = place_pivot(B, pidx, i)
         if not pivot:
             continue
 
+        pidx += 1
         B[i] = [1/pivot*b for b in B[i]]
+        B[i] = [int(b) if b.is_integer() else b for b in B[i]]
 
         for j in range(i+1, rows):
             if not B[j][i]:
                 continue
 
             p = B[j][i]
+            for k in range(i, cols):
+                entry = -p*B[i][k] + B[j][k]
 
-            B[j] = [-p*B[i][k] + B[j][k] for k in range(i, cols)]
-
-    order_pivots(B)
+                B[j][k] = int(entry) if entry.is_integer() else entry
 
     return B
 
