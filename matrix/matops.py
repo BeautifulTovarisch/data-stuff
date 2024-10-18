@@ -53,6 +53,18 @@ def norm(u):
 
     return sqrt(sum([a**2 for a in u]))
 
+def magsquare(u):
+    """
+    magsquare computes the square of the magnitude of [u].
+
+    Input:
+        u (Vector): An nx1 vector
+
+    Output:
+        The magnitude of [u] squared
+    """
+    return sum([a**2 for a in u])
+
 def normalize(u):
     """
     normalize produces a unit vector from [u] by scaling the components of [u]
@@ -82,6 +94,68 @@ def normalize(u):
         raise ValueError("u must be a non-zero vector")
 
     return [c * 1/k for c in u]
+
+def vadd(u, v):
+    return [u[i] + v[i] for i in range(len(u))]
+
+def vsub(u, v):
+    return [u[i] - v[i] for i in range(len(u))]
+
+def vscale(u, k):
+    return [a*k for a in u]
+
+# TODO: Document the precise operation that happens here. Should have read more
+# closely.
+def project(u, v):
+    """
+    """
+    dotp = _dot(u, v)
+    return dotp / magsquare(v)
+
+# TODO: Generalize to an arbitrary inner product space
+def gramschmidt(basis):
+    """
+    gramschmidt converts [basis] into an orthogonal basis using the Gram-Schmidt
+    process. The G-S algorithm can be described by the recurrence:
+
+        v_i     = u1 if i = 1
+                = u_i - sum(proj(u_i) v_k for k in 1 to i-1)
+
+    where proj(u) is given by <u, v_k>/||v_k||^2
+
+    Input:
+        basis ([]Vector): A nonempty set of vectors forming a basis.
+
+    Output:
+        A list of vectors comprising an orthgonal basis
+
+    Examples:
+        >>> gramschmidt([])
+        Traceback (most recent call last):
+            ...
+        ValueError: basis must be nonempty
+
+        >>> gramschmidt([[1, 0, 1]])
+        [[1, 0, 1]]
+
+        >>> gramschmidt(list(reversed([[1, 1, 1], [0, 1, 1], [0, 0, 1]])))
+    """
+    if not basis:
+        raise ValueError('basis must be nonempty')
+
+    if len(basis) == 1:
+        return basis
+
+    # This gives us v1, v2, ..., vn to use in the computation of the ith vector
+    orthobasis = gramschmidt(basis[1:])
+
+    u = basis[0]
+
+    # The orthogonal projection of (something onto something...)
+    for v in [vscale(v, project(u, v)) for v in orthobasis]:
+        u = vsub(u, v)
+
+    return orthobasis + [u]
 
 def matprod(A, u, v):
     """
