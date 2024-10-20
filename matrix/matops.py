@@ -490,6 +490,7 @@ def classic_multiply(A, B):
 
     return C
 
+# TODO: This procedure is horribly wrong for certain inputs. Review later.
 def rc_multiply(A, B):
     """
     rc_multiply performs the matrix multiplication AB by row-column partitions:
@@ -558,7 +559,7 @@ def normaleqn(A, b):
         A (Matrix): An mxn matrix
         b (Vector): An mx1 vector
 
-    Ouput:
+    Output:
         An mxm matrix augmented with an mx1 vector encoding a linear system.
 
     Examples:
