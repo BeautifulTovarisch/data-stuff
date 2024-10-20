@@ -138,7 +138,8 @@ def gramschmidt(basis):
         >>> gramschmidt([[1, 0, 1]])
         [[1, 0, 1]]
 
-        >>> gramschmidt(list(reversed([[1, 1, 1], [0, 1, 1], [0, 0, 1]])))
+        >>> gramschmidt([[3, -5], [1, 0]])
+        [[1, 0], [0.0, -5.0]]
     """
     if not basis:
         raise ValueError('basis must be nonempty')
