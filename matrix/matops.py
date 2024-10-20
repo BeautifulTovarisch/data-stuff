@@ -139,6 +139,8 @@ def gramschmidt(basis):
 
     where proj(u) is given by <u, v_k>/||v_k||^2
 
+    NOTE: That this procedure does not normalize the resulting basis.
+
     Input:
         basis ([]Vector): A nonempty set of vectors forming a basis.
 
@@ -545,3 +547,31 @@ def rc_multiply(A, B):
         C = mat_add(C, partial)
 
     return C
+
+def normaleqn(A, b):
+    """
+    normaleqn returns an augmented matrix representing the normal equation
+    associated with [A]x = [b]. The resulting matrix is typically then solved
+    to find least squares solutions.
+
+    Input
+        A (Matrix): An mxn matrix
+        b (Vector): An mx1 vector
+
+    Ouput:
+        An mxm matrix augmented with an mx1 vector encoding a linear system.
+
+    Examples:
+        >>> normaleqn([[1, -1], [2, 3], [4, 5]], [2, -1, 5])
+        [[21, 25, 20], [25, 35, 20]]
+
+        >>> normaleqn([[2, -1, 0], [3, 1, 2], [-1, 4, 5], [1, 2, 4]], [-1, 0, 1, 2])
+        [[15, -1, 5, -1], [-1, 22, 30, 9], [5, 30, 45, 13]]
+    """
+
+    T = trans(A)
+    mat = classic_multiply(T, A)
+    vec = matvec(T, b)
+
+    # Augment TA with the corresponding element in Tb
+    return [mat[i] + [vec[i]] for i in range(len(vec))]
