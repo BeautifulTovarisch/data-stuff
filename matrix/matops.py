@@ -108,9 +108,25 @@ def vscale(u, k):
 # closely.
 def project(u, v):
     """
+    project computes the orthogonal project of [u] onto [v] given by:
+
+        <u, v>/||v||^2 * v
+
+    in other words, [v] scaled by the ratio of the inner product of [u] and [v]
+    to the square of the magnitude of [v].
+
+    Input:
+        u, v (Vector): Vectors in some inner product space
+
+    Output:
+        The orthognal projection of [u] onto [v].
+
+    Examples:
     """
     dotp = _dot(u, v)
-    return dotp / magsquare(v)
+    c = dotp / magsquare(v)
+
+    return vscale(v, c)
 
 # TODO: Generalize to an arbitrary inner product space
 def gramschmidt(basis):
@@ -152,8 +168,8 @@ def gramschmidt(basis):
 
     u = basis[0]
 
-    # The orthogonal projection of (something onto something...)
-    for v in [vscale(v, project(u, v)) for v in orthobasis]:
+    # Subtract the orthogonal projection of u onto the current orthgonal basis.
+    for v in [project(u, v) for v in orthobasis]:
         u = vsub(u, v)
 
     return orthobasis + [u]
